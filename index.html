@@ -369,36 +369,8 @@
       transform: translateY(0);
     }
 
-    /* ── MAILERLITE OVERRIDES ── */
-    .ml-embedded { max-width: 480px; }
-    .ml-embedded .ml-form-embedWrapper { background: transparent !important; }
-    .ml-embedded .ml-form-embedBody { padding: 0 !important; background: transparent !important; }
-    .ml-embedded .ml-form-fieldRow input {
-      background: var(--surface) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 4px 0 0 4px !important;
-      color: var(--text) !important;
-      font-family: var(--sans) !important;
-      font-size: 0.95rem !important;
-      padding: 1rem 1.25rem !important;
-    }
-    .ml-embedded .ml-form-fieldRow input::placeholder { color: var(--muted) !important; }
-    .ml-embedded .ml-form-fieldRow input:focus { border-color: var(--accent) !important; outline: none !important; }
-    .ml-embedded .ml-form-embedSubmit button {
-      background: var(--accent) !important;
-      border-radius: 0 4px 4px 0 !important;
-      font-family: var(--sans) !important;
-      font-size: 0.85rem !important;
-      font-weight: 500 !important;
-      letter-spacing: 0.06em !important;
-      padding: 1rem 1.5rem !important;
-      border: none !important;
-    }
-    .ml-embedded .ml-form-embedSubmit button:hover { background: #a82e22 !important; }
-    .ml-embedded .ml-form-successBody { background: transparent !important; padding: 0 !important; }
-    .ml-embedded .ml-form-successContent h4 { color: var(--accent2) !important; font-family: var(--serif) !important; }
-    .ml-embedded .ml-form-successContent p { color: var(--muted) !important; font-family: var(--sans) !important; }
-    .ml-embedded .ml-form-formContent { display: flex !important; gap: 0 !important; }
+    /* ── HIDE MAILERLITE FORM ── */
+    .ml-embedded { display: none !important; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
@@ -441,6 +413,21 @@
 
     <div class="form-wrap">
       <div class="ml-embedded" data-form="RsHwQr"></div>
+      <div class="form-row" id="formRow">
+        <input
+          class="form-input"
+          type="email"
+          id="emailInput"
+          placeholder="your@email.com"
+          autocomplete="email"
+        />
+        <button class="form-btn" onclick="handleSubmit('emailInput','formRow','successMsg')">
+          Notify me →
+        </button>
+      </div>
+      <div class="success-msg" id="successMsg">
+        ✓ &nbsp;You're in. We'll let you know the moment it's ready.
+      </div>
       <p class="form-note">Early access only. No spam, ever.</p>
     </div>
   </section>
@@ -490,6 +477,21 @@
     </h2>
     <div class="reveal">
       <div class="ml-embedded" data-form="RsHwQr"></div>
+      <div class="form-row" id="formRow2" style="max-width:380px">
+        <input
+          class="form-input"
+          type="email"
+          id="emailInput2"
+          placeholder="your@email.com"
+          autocomplete="email"
+        />
+        <button class="form-btn" onclick="handleSubmit('emailInput2','formRow2','successMsg2')">
+          Get early access →
+        </button>
+      </div>
+      <div class="success-msg" id="successMsg2">
+        ✓ &nbsp;You're in. See you on the other side.
+      </div>
       <p class="form-note">Free to try. No credit card.</p>
     </div>
   </section>
@@ -512,6 +514,37 @@
       });
     }, { threshold: 0.15 });
     reveals.forEach(el => observer.observe(el));
+
+    // ── FORM SUBMIT — feeds into hidden MailerLite form ──
+    function handleSubmit(inputId, rowId, msgId) {
+      const email = document.getElementById(inputId).value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById(inputId).focus();
+        return;
+      }
+      // Find the hidden MailerLite input and set the email value
+      const mlInput = document.querySelector('.ml-embedded input[type="email"]');
+      if (mlInput) {
+        mlInput.value = email;
+        // Trigger MailerLite's submit button
+        const mlBtn = document.querySelector('.ml-embedded button[type="submit"]');
+        if (mlBtn) mlBtn.click();
+      }
+      // Show our beautiful success message and redirect
+      document.getElementById(rowId).style.display = 'none';
+      document.getElementById(msgId).style.display = 'block';
+      setTimeout(() => {
+        window.location.href = 'stepone-thankyou.html';
+      }, 1200);
+    }
+
+    // ── ENTER KEY ──
+    document.getElementById('emailInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSubmit('emailInput','formRow','successMsg');
+    });
+    document.getElementById('emailInput2').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSubmit('emailInput2','formRow2','successMsg2');
+    });
   </script>
 
 </body>
